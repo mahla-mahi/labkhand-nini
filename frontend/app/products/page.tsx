@@ -4,24 +4,27 @@ import ProductCatalog from "../components/ProductCatalog"; // کامپوننت �
 import { getProducts } from "@/lib/products"; // دریافت لیست محصولات
 import { getSiteSettings } from "@/lib/site-settings"; // دریافت تنظیمات سایت
 
-// تولید عنوان و توضیحات متادیتای صفحه
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettings(); // دریافت تنظیمات سایت
+  const settings = await getSiteSettings(); 
 
   return {
-    title: settings.productsPageTitle, // عنوان صفحه
-    description: settings.productsPageDescription, // توضیحات صفحه
+    title: settings.productsPageTitle,
+    description: settings.productsPageDescription,
   };
 }
 
 // کامپوننت اصلی صفحه محصولات
-export default async function ProductsPage() {
-  // دریافت محصولات و تنظیمات به‌صورت هم‌زمان
-  const [products, settings] = await Promise.all([
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  // دریافت محصولات، تنظیمات و عبارت جست‌وجو به‌صورت هم‌زمان
+  const [{ q }, products, settings] = await Promise.all([
+    searchParams,
     getProducts(),
     getSiteSettings(),
   ]);
-
   return (
     // ظرف اصلی صفحه با عرض و فاصله‌های واکنش‌گرا
     <main className="mx-auto min-h-[60vh] w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
@@ -31,7 +34,7 @@ export default async function ProductsPage() {
         title={settings.featuredTitle} // عنوان کاتالوگ
         description={settings.featuredDescription} // توضیحات کاتالوگ
         eyebrow={settings.catalogEyebrow} // متن کوچک بالای کاتالوگ
-        searchPlaceholder={settings.catalogSearchPlaceholder} // متن راهنمای جست‌وجو
+        initialSearch={q ?? ""} // اعمال عبارت جست‌وجو از نوار بالای سایت
         emptyTitle={settings.catalogEmptyTitle} // عنوان حالت بدون نتیجه
         emptyDescription={settings.catalogEmptyDescription} // توضیح حالت بدون نتیجه
       />
